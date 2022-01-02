@@ -28,6 +28,10 @@ def test_table() -> List[Dict]:
 def index() -> str:
     return json.dumps({'test_table': test_table()})
 
+@app.route('/new-page')
+def page1():
+    return "Hi"
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
