@@ -10,6 +10,7 @@ from flask import request
 from flask import jsonify
 from flask import render_template
 from view_form import SongForm, SearchForm
+import mysql.connector
 from lib.conf import AWS_db_credential
 
 # credential imported from db_config.cfg
@@ -52,6 +53,25 @@ def market_page():
 #     conn.close()
 #     return render_template('index.html', u=u)
 
+@app.route('/test2-sql')
+def test_sql():
+    config = {
+        'user': 'root',
+        'password': 'root',
+        'host': 'db',
+        'port': '3306',
+        'database': 'test'
+    }
+    conn = mysql.connector.connect(**config)
+    # conn = db.connect(host=host_name, user=user_name, password=password, port=port, db=db_name)
+    cur = conn.cursor()
+    sql = "SELECT * FROM `test`.`guitar_song`"
+    cur.execute(sql)
+    u = cur.fetchall() # 返回 tuple 
+    conn.close()
+    return f"hello {u}"
+
+
 @app.route('/test2-aws')
 def index2():
     conn = db.connect(host=host_name, user=user_name, password=password, port=port, db=db_name)
@@ -64,7 +84,15 @@ def index2():
 
 @app.route('/song-share', methods=['GET', 'POST'])
 def song_share():
-    conn = db.connect(host=host_name, user=user_name, password=password, port=port, db=db_name)
+    config = {
+        'user': 'root',
+        'password': 'root',
+        'host': 'db',
+        'port': '3306',
+        'database': 'test'
+    }
+    conn = mysql.connector.connect(**config)
+    # conn = db.connect(host=host_name, user=user_name, password=password, port=port, db=db_name)
     cur = conn.cursor()
     form = SongForm()
     #  flask_wtf類中提供判斷是否表單提交過來的method，不需要自行利用request.method來做判斷
@@ -92,14 +120,22 @@ def song_share():
 
 @app.route('/query-song', methods=['GET', 'POST'])
 def query_song():
-    conn = db.connect(host=host_name, user=user_name, password=password, port=port, db=db_name)
+    config = {
+        'user': 'root',
+        'password': 'root',
+        'host': 'db',
+        'port': '3306',
+        'database': 'test'
+    }
+    conn = mysql.connector.connect(**config)
+    # conn = db.connect(host=host_name, user=user_name, password=password, port=port, db=db_name)
     # conn = db.connect(host='127.0.0.1', user='root', password='', port=3306, db='test')
     cur = conn.cursor()
     form = SearchForm()
     if form.validate_on_submit():
         q_name = request.values.get('query_name')
         sql = f"""
-        SELECT `id`, `name`, `author`, `desc`, `url` FROM `guitar_song`
+        SELECT `id`, `name`, `author`, `desc`, `url` FROM `test`.`guitar_song`
         WHERE `name`= '{q_name}'
         """
         print(sql)
