@@ -1,7 +1,7 @@
 version: "2"
 services:
   app:
-    build: ./app2
+    build: ./app
     links:
       - db
     ports:
