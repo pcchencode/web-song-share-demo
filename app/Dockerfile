@@ -1,18 +1,14 @@
-# Use an official Python runtime as an image
 FROM python:3.6
+WORKDIR /web-song-share/app
 
-# The EXPOSE instruction indicates the ports on which a container
-EXPOSE 5000
+COPY requirements.txt /web-song-share/app
+RUN apt-get update && apt-get install sudo
 
-# Sets the working directory for following COPY and CMD instructions
-# Notice we haven’t created a directory by this name - this instruction
-# creates a directory with this name if it doesn’t exist
-WORKDIR /app
+# RUN pip3 install --no-cache-dir --compile -r requirements.txt
+RUN pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org --no-cache-dir -r requirements.txt
 
-COPY requirements.txt /app
-RUN python -m pip install --upgrade pip
-RUN pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org --no-cache-dir -r requirements.txt
+COPY ./ /web-song-share/app
 
-# Run app.py when the container launches
-COPY app.py /app
-CMD python app.py
+# CMD ["sudo", "gunicorn", "-w", "1", "-b", "0.0.0.0:80", "app:app"]
+CMD ["python3", "app.py"]
+# gunicorn -w 1 -b 0.0.0.0:80 run:app --daemon
